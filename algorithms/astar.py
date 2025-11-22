@@ -42,4 +42,4 @@ def astar(start, goal, maze):
                 new_g = g + 1  # Mevcut maliyeti 1 artır (her adım maliyeti 1)
                 new_f = new_g + manhattan(neighbor, goal)  # Toplam f = g + h
                 heapq.heappush(open_set, (new_f, new_g, neighbor, path + [neighbor]))
-    return None, expanded
+    return [], expanded
