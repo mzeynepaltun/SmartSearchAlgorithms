@@ -69,41 +69,33 @@ class MazeGUI:
                     color = PATH_COLOR
                 self.canvas.create_rectangle(x1, y1, x2, y2, fill=color, outline="gray")
 
-    def animate(self, steps, path=None):
-        visited_cells = []
+    def animate(self, steps):
         def step(i=0):
             if i < len(steps):
-                visited_cells.append(steps[i])
-                self.draw_maze(path=path, visited_cells=visited_cells)
+                position, path = steps[i]
+                self.draw_maze(path=path, visited_cells=[pos for pos,_ in steps[:i+1]])
                 self.master.after(100, step, i+1)
         step()
 
-    def run_algorithm(self, algorithm_name):
-        algorithms = {
-            "BFS": bfs,
-            "DFS": dfs,
-            "A*": astar
-        }
 
+    def run_algorithm(self, algorithm_name):
+        algorithms = {"BFS": bfs, "DFS": dfs, "A*": astar}
         func = algorithms[algorithm_name]
 
         start_time = time.time()
-        path, expanded = func(self.start, self.goal, self.maze)
+        path, expanded, steps = func(self.start, self.goal, self.maze)
         end_time = time.time()
         duration = round(end_time - start_time, 4)
 
-        # BFS ile en kısa yol referansı al (yol kalitesi için)
-        shortest_path, _ = bfs(self.start, self.goal, self.maze)
+        shortest_path, _, _ = bfs(self.start, self.goal, self.maze)
         shortest_len = len(shortest_path)-1 if shortest_path else None
-        steps = len(path)-1 if path else 0
-        quality = calculate_path_quality(shortest_len, steps) if shortest_len else 0
+        steps_count = len(path)-1 if path else 0
+        quality = calculate_path_quality(shortest_len, steps_count) if shortest_len else 0
 
-        # Animasyonu başlat (sadece yol bulunduysa)
-        if path:
-            self.animate(path)
+        if steps:
+            self.animate(steps)
 
-        # Performans tablosuna ekle
-        self.tree.insert("", "end", values=(steps, expanded, duration, quality))
+        self.tree.insert("", "end", values=(steps_count, expanded, duration, quality))
 
 
 if __name__ == "__main__":

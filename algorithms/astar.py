@@ -24,13 +24,15 @@ def astar(start, goal, maze):
     heapq.heappush(open_set, (0 + manhattan(start, goal), 0, start, [start])) # Başlangıç düğümü
     visited = set()  # Ziyaret edilen hücreler
     expanded = 0      # Genişletilen hücre sayısı
+    steps = []       # Ziyaret edilen hücrelerin sırası
 
     while open_set:
         f, g, position, path = heapq.heappop(open_set)  # f değeri en düşük olanı al
         expanded += 1
+        steps.append((position, list(path))) # Ziyaret edilen hücre sırasına ekle
 
         if position == goal:          # Hedefe ulaşıldı mı?
-            return path, expanded
+            return path, expanded, steps
 
         if position in visited:       # Zaten ziyaret edilmişse atla
             continue
@@ -42,4 +44,4 @@ def astar(start, goal, maze):
                 new_g = g + 1  # Mevcut maliyeti 1 artır (her adım maliyeti 1)
                 new_f = new_g + manhattan(neighbor, goal)  # Toplam f = g + h
                 heapq.heappush(open_set, (new_f, new_g, neighbor, path + [neighbor]))
-    return [], expanded
+    return [], expanded, steps
